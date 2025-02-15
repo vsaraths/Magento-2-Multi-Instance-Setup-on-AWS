@@ -1,0 +1,21 @@
+
+#SSH to ES_IP
+
+wget -qO - https://artifacts.elastic.co/GPG-KEY-elasticsearch | sudo gpg --dearmor -o /usr/share/keyrings/elastic.gpg
+echo "deb [signed-by=/usr/share/keyrings/elastic.gpg] https://artifacts.elastic.co/packages/7.x/apt stable main" | sudo tee /etc/apt/sources.list.d/elastic-7.x.list
+sudo apt update && sudo apt install elasticsearch -y
+
+
+#Edit /etc/elasticsearch/elasticsearch.yml:
+
+network.host: ES_IP
+cluster.initial_master_nodes: ["ES_IP"]
+
+#Limit JVM heap in /etc/elasticsearch/jvm.options:
+
+ini
+
+-Xms512m
+-Xmx512m
+
+#Start Elasticsearch: sudo systemctl start elasticsearch
