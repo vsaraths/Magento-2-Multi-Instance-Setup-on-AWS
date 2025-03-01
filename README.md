@@ -25,6 +25,13 @@ Instance 2: Elasticsearch (Private IP: ES_IP)
 Instance 3: Nginx, PHP 8.1, Redis, Magento 2 (Private IP: WEB_IP)
 Instance 4: Varnish (Public IP: VARNISH_IP)
 
+Architecture Diagram
+🚀 Instance Setup
+Launch four Debian 11 t2.micro instances. Assign security groups:
+Database: Allow MySQL (3306) from WEB_IP.
+Elasticsearch: Allow HTTP (9200) from WEB_IP.
+Web Server: Allow HTTP (80), HTTPS (443), SSH (22).
+Varnish: Allow HTTP (80), HTTPS (443), SSH (22).
 
 🚀 Instance Setup
 Launch four Debian 11 t2.micro instances. Assign security groups:
