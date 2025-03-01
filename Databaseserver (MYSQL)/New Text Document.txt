@@ -1,0 +1,7 @@
+sudo gpg --keyserver keyserver.ubuntu.com --recv-keys B7B3B788A8D3785C
+sudo gpg --export B7B3B788A8D3785C | sudo tee /usr/share/keyrings/mysql-apt-key.gpg > /dev/null
+
+echo "deb [signed-by=/usr/share/keyrings/mysql-apt-key.gpg] https://repo.mysql.com/apt/debian/ bookworm mysql-8.0" | sudo tee /etc/apt/sources.list.d/mysql.list
+
+sudo apt update
+sudo apt install mysql-server
