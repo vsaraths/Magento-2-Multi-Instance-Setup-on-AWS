@@ -1,3 +1,11 @@
+SSH to DB_IP
+
+bash
+Copy
+sudo apt update
+sudo apt install mysql-server -y
+sudo mysql_secure_installation
+
 sudo gpg --keyserver keyserver.ubuntu.com --recv-keys B7B3B788A8D3785C
 sudo gpg --export B7B3B788A8D3785C | sudo tee /usr/share/keyrings/mysql-apt-key.gpg > /dev/null
 
@@ -5,3 +13,18 @@ echo "deb [signed-by=/usr/share/keyrings/mysql-apt-key.gpg] https://repo.mysql.c
 
 sudo apt update
 sudo apt install mysql-server
+
+Create Magento database and user:
+
+sql
+Copy
+CREATE DATABASE magento;
+CREATE USER 'magento'@'WEB_IP' IDENTIFIED BY 'SecurePassword123!';
+GRANT ALL PRIVILEGES ON magento.* TO 'magento'@'WEB_IP';
+FLUSH PRIVILEGES;
+Edit /etc/mysql/mysql.conf.d/mysqld.cnf:
+
+ini
+Copy
+bind-address = 0.0.0.0
+Restart MySQL: sudo systemctl restart mysql
