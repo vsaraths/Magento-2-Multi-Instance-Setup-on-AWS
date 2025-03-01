@@ -1,0 +1,93 @@
+SSH to WEB_IP
+
+Install Components
+
+sudo apt install -y nginx redis-server
+sudo apt install -y php8.1 php8.1-fpm php8.1-mysql php8.1-curl php8.1-xml php8.1-gd php8.1-intl php8.1-mbstring php8.1-soap php8.1-zip
+
+Create System User
+
+sudo useradd -m -s /bin/bash test-ssh
+sudo groupadd clp
+sudo usermod -aG clp test-ssh
+
+
+Configure PHP-FPM
+Edit /etc/php/8.1/fpm/pool.d/www.conf:
+
+
+[www]
+user = test-ssh
+group = clp
+listen.owner = test-ssh
+listen.group = clp
+Install Magento 2
+
+sudo -u test-ssh composer create-project --repository-url=https://repo.magento.com/ magento/project-community-edition /var/www/magento
+cd /var/www/magento
+
+sudo -u test-ssh bin/magento setup:install \
+  --base-url=https://test.mgt.com \
+  --db-host=DB_IP \
+  --db-name=magento \
+  --db-user=magento \
+  --db-password=SecurePassword123! \
+  --elasticsearch-host=ES_IP \
+  --admin-firstname=Admin \
+  --admin-lastname=User \
+  --admin-email=admin@test.com \
+  --admin-user=admin \
+  --admin-password=Admin123! \
+  --use-rewrites=1 \
+  --backend-frontname=admin
+
+
+Configure Nginx
+Create /etc/nginx/sites-available/test.mgt.com:
+
+nginx
+
+server {
+    listen 80;
+    server_name test.mgt.com;
+    return 301 https://$host$request_uri;
+}
+
+server {
+    listen 443 ssl;
+    server_name test.mgt.com;
+    
+    ssl_certificate /etc/nginx/ssl/self-signed.crt;
+    ssl_certificate_key /etc/nginx/ssl/self-signed.key;
+    
+    set $MAGE_ROOT /var/www/magento;
+    include /var/www/magento/nginx.conf.sample;
+}
+Generate self-signed SSL:
+
+sudo mkdir /etc/nginx/ssl
+sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/nginx/ssl/self-signed.key -out /etc/nginx/ssl/self-signed.crt
+
+
+Configure Redis
+Edit app/etc/env.php:
+
+'session' => [
+    'save' => 'redis',
+    'redis' => [
+        'host' => '127.0.0.1',
+        'port' => '6379',
+        'database' => '0',
+    ]
+],
+'cache' => [
+    'frontend' => [
+        'default' => [
+            'backend' => 'Cm_Cache_Backend_Redis',
+            'backend_options' => [
+                'server' => '127.0.0.1',
+                'port' => '6379'
+            ]
+        ]
+    ]
+]
